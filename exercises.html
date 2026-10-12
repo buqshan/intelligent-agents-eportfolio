@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Exercises and Theory · Intelligent Agents E-Portfolio</title>
+<meta name="description" content="E-portfolio of Abdullah A. Buqshan for the Intelligent Agents module, MSc Artificial Intelligence, University of Essex Online.">
+<meta name="author" content="Abdullah A. Buqshan">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230b7a75'/%3E%3Ctext x='16' y='22' font-family='Arial' font-size='15' font-weight='700' fill='white' text-anchor='middle'%3EIA%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top">
+  <div class="brand"><span class="mark">IA</span><div><strong>Intelligent Agents</strong><span>E-Portfolio · Abdullah A. Buqshan</span></div></div>
+  <button class="menu" aria-expanded="false" aria-controls="nav" onclick="const n=document.getElementById('nav');const o=n.classList.toggle('open');this.setAttribute('aria-expanded',o)">Menu</button>
+</header>
+<div class="shell">
+<nav id="nav" aria-label="Sections"><ol><li><a href="index.html"><span class="n">01</span>Introduction</a></li><li><a href="exercises.html" aria-current="page"><span class="n">02</span>Exercises</a></li><li><a href="forum.html"><span class="n">03</span>Forum</a></li><li><a href="team-project.html"><span class="n">04</span>Team Project</a></li><li><a href="implementation.html"><span class="n">05</span>Implementation</a></li><li><a href="case-studies.html"><span class="n">06</span>Case Studies</a></li><li><a href="reflection.html"><span class="n">07</span>Reflection</a></li><li><a href="references.html"><span class="n">08</span>References</a></li><li><a href="code.html"><span class="n">09</span>Code & Evidence</a></li></ol>
+<div class="navmeta"><p>MSc Artificial Intelligence, University of Essex Online</p><p>Student [STUDENT NUMBER]</p><p>October 2026</p></div></nav>
+<main id="main">
+<p class="eyebrow">Section 02</p>
+<h1>Exercises and Theory</h1>
+<h3>Reactive and hybrid agents (Unit 5)</h3>
+<p>After five progressive question sets I sat a 40-question exam and scored 88%. A coverage check exposed gaps in abstract agent formalism, environment properties and the IRMA architecture, which I then targeted (Wooldridge, 2009). The ideas that stayed with me were Brooks's (1991) claim that the world is its own best model and BDI's tension between commitment and reconsideration (Bratman, Israel and Pollack, 1988).</p>
+<h3>First-order logic</h3>
+<p>My errors were more instructive than my correct answers. I accepted <code>f(x)</code> as a well-formed formula, classified <code>Employee(x)</code> as a function and missed the type error in <code>P(P(x))</code>: all the same confusion between terms, which denote individuals, and formulas, which denote truth values. I needed a step-by-step walkthrough to see why ∀ pairs with → and ∃ with ∧, and why the agent variable depends on the service variable.</p>
+<pre class="code" data-lang="text"><code># Exercise A2: &quot;Every active service is monitored by at least one agent&quot;
+∀x ((Service(x) ∧ Active(x)) → ∃y (Agent(y) ∧ Monitors(y, x)))
+
+# Exercise A3: &quot;No agent can invoke a tool that is not registered&quot;
+¬∃x ∃t (Agent(x) ∧ Tool(t) ∧ CanInvoke(x,t) ∧ ¬Registered(t))
+≡ ∀x ∀t ((Agent(x) ∧ Tool(t) ∧ CanInvoke(x,t)) → Registered(t))</code></pre>
+<p>Exercise A3 is effectively a guardrail written in logic. It changed how I read tool-permission policies, and I reuse the pattern in Case Study 1. Reading Searle (1969) on speech acts explained the basis of agent communication languages such as KQML (Finin <em>et al.</em>, 1994), which our team later decided we did not need.</p>
+<div class="pager"><a class="pn prev" href="index.html">← Introduction</a><a class="pn next" href="forum.html">Forum →</a></div>
+<footer><p>© 2026 Abdullah A. Buqshan · MSc Artificial Intelligence, University of Essex Online · Harvard (Cite Them Right) referencing</p></footer>
+</main>
+</div>
+</body>
+</html>

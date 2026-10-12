@@ -1,0 +1,35 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.16, pytest-9.1.1, pluggy-1.6.0 -- /usr/bin/python3
+cachedir: .pytest_cache
+rootdir: telecom_agent
+plugins: anyio-4.15.1, mock-3.16.0
+collecting ... collected 26 items
+
+tests/test_suite.py::TestAgentMessage::test_message_fields_are_set_correctly PASSED [  3%]
+tests/test_suite.py::TestAgentMessage::test_message_auto_generates_uuid_and_timestamp PASSED [  7%]
+tests/test_suite.py::TestAgentMessage::test_message_timestamp_is_utc PASSED [ 11%]
+tests/test_suite.py::TestPlannerAgent::test_planner_classifies_mpls_incident PASSED [ 15%]
+tests/test_suite.py::TestPlannerAgent::test_planner_classifies_bgp_incident PASSED [ 19%]
+tests/test_suite.py::TestPlannerAgent::test_planner_classifies_fibre_incident PASSED [ 23%]
+tests/test_suite.py::TestPlannerAgent::test_planner_returns_correct_message_schema PASSED [ 26%]
+tests/test_suite.py::TestAnalyserAgent::test_analyser_returns_analysis_dict PASSED [ 30%]
+tests/test_suite.py::TestAnalyserAgent::test_parse_analysis_extracts_all_fields PASSED [ 34%]
+tests/test_suite.py::TestAnalyserAgent::test_fallback_result_structure PASSED [ 38%]
+tests/test_suite.py::TestAnalyserAgent::test_analyser_timeout_returns_fallback_message PASSED [ 42%]
+tests/test_suite.py::TestReporterAgent::test_reporter_returns_markdown_report PASSED [ 46%]
+tests/test_suite.py::TestReporterAgent::test_reporter_produces_structured_dict PASSED [ 50%]
+tests/test_suite.py::TestReporterAgent::test_reporter_flags_fallback_in_report PASSED [ 53%]
+tests/test_suite.py::TestIntegration::test_pipeline_completes_for_mpls_incident PASSED [ 57%]
+tests/test_suite.py::TestIntegration::test_pipeline_completes_for_bgp_incident PASSED [ 61%]
+tests/test_suite.py::TestIntegration::test_message_trace_has_minimum_entries PASSED [ 65%]
+tests/test_suite.py::TestIntegration::test_report_dict_has_required_keys PASSED [ 69%]
+tests/test_suite.py::TestIntegration::test_n_messages_count_is_accurate PASSED [ 73%]
+tests/test_suite.py::TestFunctional::test_functional_mpls_scenario PASSED [ 76%]
+tests/test_suite.py::TestFunctional::test_functional_bgp_scenario PASSED [ 80%]
+tests/test_suite.py::TestFunctional::test_functional_fibre_scenario PASSED [ 84%]
+tests/test_suite.py::TestEdgeCases::test_edge_empty_retrieved_docs PASSED [ 88%]
+tests/test_suite.py::TestEdgeCases::test_edge_llm_timeout_does_not_crash_pipeline PASSED [ 92%]
+tests/test_suite.py::TestEdgeCases::test_edge_malformed_incident_json PASSED [ 96%]
+tests/test_suite.py::TestEdgeCases::test_edge_unknown_incident_type_uses_default_plan PASSED [100%]
+
+============================== 26 passed in 0.17s ==============================

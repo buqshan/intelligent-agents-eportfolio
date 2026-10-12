@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Implemented System and Critical Evaluation (Week 11) · Intelligent Agents E-Portfolio</title>
+<meta name="description" content="E-portfolio of Abdullah A. Buqshan for the Intelligent Agents module, MSc Artificial Intelligence, University of Essex Online.">
+<meta name="author" content="Abdullah A. Buqshan">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230b7a75'/%3E%3Ctext x='16' y='22' font-family='Arial' font-size='15' font-weight='700' fill='white' text-anchor='middle'%3EIA%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top">
+  <div class="brand"><span class="mark">IA</span><div><strong>Intelligent Agents</strong><span>E-Portfolio · Abdullah A. Buqshan</span></div></div>
+  <button class="menu" aria-expanded="false" aria-controls="nav" onclick="const n=document.getElementById('nav');const o=n.classList.toggle('open');this.setAttribute('aria-expanded',o)">Menu</button>
+</header>
+<div class="shell">
+<nav id="nav" aria-label="Sections"><ol><li><a href="index.html"><span class="n">01</span>Introduction</a></li><li><a href="exercises.html"><span class="n">02</span>Exercises</a></li><li><a href="forum.html"><span class="n">03</span>Forum</a></li><li><a href="team-project.html"><span class="n">04</span>Team Project</a></li><li><a href="implementation.html" aria-current="page"><span class="n">05</span>Implementation</a></li><li><a href="case-studies.html"><span class="n">06</span>Case Studies</a></li><li><a href="reflection.html"><span class="n">07</span>Reflection</a></li><li><a href="references.html"><span class="n">08</span>References</a></li><li><a href="code.html"><span class="n">09</span>Code & Evidence</a></li></ol>
+<div class="navmeta"><p>MSc Artificial Intelligence, University of Essex Online</p><p>Student [STUDENT NUMBER]</p><p>October 2026</p></div></nav>
+<main id="main">
+<p class="eyebrow">Section 05</p>
+<h1>Implemented System and Critical Evaluation (Week 11)</h1>
+<p>I built a five-agent pipeline for network operations centre (NOC) incidents. An Orchestrator routes typed <code>AgentMessage</code> objects through a registry. A Planner produces a BDI-framed diagnostic plan. A Retrieval agent runs FAISS search (k = 3) over 15 fault patterns, following the RAG pattern (Lewis <em>et al.</em>, 2020). An Analyser prompts Mistral-7B-Instruct with a structured fallback, and a Reporter writes the resolution report. The app is deployed from GitHub on Streamlit Community Cloud. On 12 October 2026 I re-ran the suite and all 26 tests passed.</p>
+<pre class="code" data-lang="python"><code># agents/orchestrator.py (excerpt): every hop is traced, so the run is auditable
+def _dispatch(self, target_name: str, payload: dict) -&gt; AgentMessage:
+    self._msg_counter += 1
+    outbound = AgentMessage(sender=self.name, recipient=target_name, payload=payload)
+    self.message_trace.append(f&quot;MSG #{self._msg_counter:02d} {self.name}→{target_name} &quot;
+                              f&quot;| payload_keys={list(payload.keys())}&quot;)
+    response = self.agents[target_name].run(outbound)   # registry allows mock injection in tests
+    ...
+
+# agents/analyser.py (excerpt): fail-safe default when the LLM is unavailable
+def _fallback_result(reason: str) -&gt; dict:
+    return {&quot;root_cause&quot;: f&quot;LLM analysis unavailable: {reason}&quot;, &quot;confidence&quot;: 0.0,
+            &quot;recommended_actions&quot;: [&quot;Escalate to Tier-2 NOC immediately&quot;],
+            &quot;escalation_required&quot;: True, &quot;escalation_tier&quot;: &quot;Tier-2 NOC&quot;,
+            &quot;sla_risk&quot;: &quot;HIGH&quot;, &quot;fallback&quot;: True, &quot;fallback_reason&quot;: reason}
+</code></pre>
+<figure><img src="img/app.jpg" alt="Figure 2: Deployed application (noc-agent-buali.streamlit.app), showing the sidebar indicator &quot;Running in demo mode&quot;." loading="lazy"><figcaption>Figure 2: Deployed application (noc-agent-buali.streamlit.app), showing the sidebar indicator "Running in demo mode".</figcaption></figure>
+<pre class="code" data-lang="text"><code>$ python -m pytest tests/test_suite.py -v        # re-run 12 October 2026
+collected 26 items
+TestAgentMessage (3) ......... PASSED     TestIntegration (5) ......... PASSED
+TestPlannerAgent (4) ......... PASSED     TestFunctional (3) .......... PASSED
+TestAnalyserAgent (4) ........ PASSED     TestEdgeCases (4) ........... PASSED
+TestReporterAgent (3) ........ PASSED
+============================== 26 passed in 0.17s ==============================
+</code></pre>
+<h3>Remediation log (defects actually encountered)</h3>
+<div class="tbl"><table><thead><tr><th scope="col">Defect</th><th scope="col">How found</th><th scope="col">Fix</th></tr></thead><tbody><tr><td>Action-list regex missed multi-line output</td><td>First local pytest run</td><td>Permissive multi-line pattern</td></tr><tr><td>Pipeline tests tried to download the embedding model</td><td>Same run: all integration and functional tests failed</td><td>Mock retrieval injected via <code>register_agent</code></td></tr><tr><td>Notebook <code>SyntaxError</code> after JSON serialisation</td><td>Colab, Section 5</td><td>Parenthesised assert messages</td></tr><tr><td>HTTP 500 from undocumented <code>st._config</code> call</td><td>Live app crash</td><td><code>.streamlit/config.toml</code></td></tr><tr><td>Raw HTML and unreadable contrast in report</td><td>My own screenshot testing</td><td>Native Streamlit components</td></tr><tr><td>Public URL died with the Colab session</td><td>Sharing test</td><td>GitHub and Streamlit Community Cloud</td></tr></tbody></table></div>
+<h3>Design (week 7) versus implementation (week 11)</h3>
+<figure class="svgfig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 500" role="img" aria-labelledby="archT archD" class="arch" font-family="Inter, system-ui, sans-serif">
+  <title id="archT">Week 7 team design versus week 11 implementation</title>
+  <desc id="archD">Left: two-agent design with a human verification gate before the evidence store. Right: five-agent implementation in which a central orchestrator routes messages to planner, retrieval, analyser and reporter, with an advisory escalation flag instead of a human gate.</desc>
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ahead"/></marker>
+  </defs>
+  <style>
+    .arch .panel{fill:var(--svg-panel,#f6f8fa);stroke:var(--svg-rule,#d5dce3)}
+    .arch .box{fill:var(--svg-box,#ffffff);stroke:var(--svg-line,#5b6b7b);stroke-width:1.2}
+    .arch .key{fill:var(--svg-accent-bg,#e3f2f1);stroke:var(--svg-accent,#0b7a75);stroke-width:1.6}
+    .arch .warn{fill:var(--svg-warn-bg,#fdf0e1);stroke:var(--svg-warn,#b45f06);stroke-width:1.4;stroke-dasharray:5 4}
+    .arch text{fill:var(--svg-ink,#1b2733);font-size:13px}
+    .arch .t{font-weight:600}
+    .arch .s{font-size:11px;fill:var(--svg-muted,#556270)}
+    .arch .h{font-size:15px;font-weight:700}
+    .arch .ln{stroke:var(--svg-line,#5b6b7b);stroke-width:1.4;fill:none}
+    .arch .lnA{stroke:var(--svg-accent,#0b7a75);stroke-width:1.8;fill:none}
+    .arch .lnW{stroke:var(--svg-warn,#b45f06);stroke-width:1.4;fill:none;stroke-dasharray:5 4}
+    .arch .ahead{fill:var(--svg-line,#5b6b7b)}
+  </style>
+
+  <!-- LEFT PANEL: design -->
+  <rect class="panel" x="8" y="8" width="452" height="484" rx="10"/>
+  <text class="h" x="24" y="36">Week 7: team design (Group B)</text>
+  <text class="s" x="24" y="54">Health-sciences literature screening · 2 agents</text>
+
+  <rect class="box" x="24" y="78" width="130" height="46" rx="6"/><text class="t" x="89" y="98" text-anchor="middle">User interface</text><text class="s" x="89" y="114" text-anchor="middle">research question</text>
+  <rect class="key" x="190" y="72" width="170" height="58" rx="6"/><text class="t" x="275" y="96" text-anchor="middle">Planning &amp; Retrieval</text><text class="s" x="275" y="113" text-anchor="middle">BDI state · ReAct loop</text>
+  <rect class="box" x="300" y="160" width="140" height="46" rx="6"/><text class="t" x="370" y="180" text-anchor="middle">Scholarly APIs</text><text class="s" x="370" y="196" text-anchor="middle">PubMed · S2 · Crossref</text>
+  <rect class="box" x="120" y="160" width="140" height="46" rx="6"/><text class="t" x="190" y="180" text-anchor="middle">JSON buffer</text><text class="s" x="190" y="196" text-anchor="middle">schema-validated</text>
+  <rect class="key" x="120" y="240" width="140" height="52" rx="6"/><text class="t" x="190" y="262" text-anchor="middle">Curation Agent</text><text class="s" x="190" y="278" text-anchor="middle">filter · rank · summarise</text>
+  <rect class="box" x="300" y="240" width="140" height="52" rx="6"/><text class="t" x="370" y="262" text-anchor="middle">LLM service</text><text class="s" x="370" y="278" text-anchor="middle">free-tier, replaceable</text>
+  <rect class="key" x="120" y="330" width="140" height="52" rx="6" style="stroke-width:2.4"/><text class="t" x="190" y="352" text-anchor="middle">Human reviewer</text><text class="s" x="190" y="368" text-anchor="middle">approve / flag / reject</text>
+  <rect class="box" x="120" y="420" width="140" height="46" rx="6"/><text class="t" x="190" y="440" text-anchor="middle">Evidence store</text><text class="s" x="190" y="456" text-anchor="middle">SQLite</text>
+
+  <path class="ln" d="M154 101 H188" marker-end="url(#ah)"/>
+  <path class="ln" d="M330 130 V158" marker-end="url(#ah)"/>
+  <path class="ln" d="M240 130 L205 158" marker-end="url(#ah)"/>
+  <path class="ln" d="M190 206 V238" marker-end="url(#ah)"/>
+  <path class="ln" d="M260 266 H298" marker-end="url(#ah)"/>
+  <path class="lnA" d="M190 292 V328" marker-end="url(#ah)"/>
+  <path class="lnA" d="M190 382 V418" marker-end="url(#ah)"/>
+  <text class="s" x="198" y="406">approve</text>
+  <path class="ln" d="M120 356 H72 V266 H118" marker-end="url(#ah)"/>
+  <text class="s" x="30" y="316">reject:</text><text class="s" x="30" y="330">revise</text>
+
+  <!-- RIGHT PANEL: implementation -->
+  <rect class="panel" x="500" y="8" width="452" height="484" rx="10"/>
+  <text class="h" x="516" y="36">Week 11: my implementation</text>
+  <text class="s" x="516" y="54">Telecom NOC incidents · 5 agents · Streamlit</text>
+
+  <rect class="box" x="516" y="78" width="130" height="46" rx="6"/><text class="t" x="581" y="98" text-anchor="middle">Incident goal</text><text class="s" x="581" y="114" text-anchor="middle">web form / scenario</text>
+  <rect class="key" x="660" y="170" width="150" height="60" rx="6" style="stroke-width:2.4"/><text class="t" x="735" y="195" text-anchor="middle">Orchestrator</text><text class="s" x="735" y="212" text-anchor="middle">registry · message trace</text>
+
+  <rect class="box" x="516" y="290" width="130" height="52" rx="6"/><text class="t" x="581" y="312" text-anchor="middle">Planner</text><text class="s" x="581" y="328" text-anchor="middle">keyword → template</text>
+  <rect class="box" x="672" y="290" width="126" height="52" rx="6"/><text class="t" x="735" y="312" text-anchor="middle">Retrieval</text><text class="s" x="735" y="328" text-anchor="middle">FAISS · k = 3 · 15 KB</text>
+  <rect class="box" x="822" y="290" width="118" height="52" rx="6"/><text class="t" x="881" y="312" text-anchor="middle">Analyser</text><text class="s" x="881" y="328" text-anchor="middle">Mistral-7B / demo</text>
+  <rect class="box" x="822" y="170" width="118" height="60" rx="6"/><text class="t" x="881" y="195" text-anchor="middle">Reporter</text><text class="s" x="881" y="212" text-anchor="middle">Markdown report</text>
+  <rect class="box" x="822" y="78" width="118" height="46" rx="6"/><text class="t" x="881" y="98" text-anchor="middle">Resolution</text><text class="s" x="881" y="114" text-anchor="middle">root cause · actions</text>
+  <rect class="warn" x="560" y="400" width="340" height="62" rx="6"/><text class="t" x="730" y="424" text-anchor="middle">Escalation flag (advisory)</text><text class="s" x="730" y="442" text-anchor="middle">fallback: confidence 0.0 → Tier-2 · nothing enforces it</text>
+
+  <path class="ln" d="M581 124 L690 168" marker-end="url(#ah)"/>
+  <path class="lnA" d="M690 230 L600 288" marker-end="url(#ah)"/>
+  <path class="lnA" d="M735 230 V288" marker-end="url(#ah)"/>
+  <path class="lnA" d="M780 230 L860 288" marker-end="url(#ah)"/>
+  <path class="lnA" d="M810 200 H820" marker-end="url(#ah)"/>
+  <path class="ln" d="M881 170 V126" marker-end="url(#ah)"/>
+  <path class="lnW" d="M881 342 V380 H780 V398" marker-end="url(#ah)"/>
+  <text class="s" x="516" y="222">dispatch ↔ reply</text><text class="s" x="516" y="236">(8 traced messages)</text>
+</svg>
+<figcaption>Figure 3: Week 7 team design versus week 11 implementation (redrawn from the proposal and the code).</figcaption></figure>
+<div class="tbl"><table><thead><tr><th scope="col">Aspect</th><th scope="col">Team design</th><th scope="col">My implementation</th></tr></thead><tbody><tr><td>Domain</td><td>Health-sciences literature screening</td><td>Telecom NOC incidents</td></tr><tr><td>Agents</td><td>Two cooperating agents</td><td>Five, with central orchestrator</td></tr><tr><td>Orchestration</td><td>LangGraph/LangChain</td><td>Custom, every message traced</td></tr><tr><td>Oversight</td><td>Human gate before storage</td><td>Advisory escalation flag only</td></tr><tr><td>Traceability</td><td>Claim → extract → identifier</td><td>Message trace; KB IDs in report</td></tr></tbody></table></div>
+<p><strong>Critical evaluation.</strong> I changed domain so that my NOC experience could supply realistic scenarios. Decomposition, typed messages and bounded failure carried over, but the design's key safeguard, the human verification gate, has no executable counterpart. Three weaknesses outweigh the green suite. The Planner matches keywords rather than planning with the LLM. The deployed app runs in demo mode, so its confidence values are templated. The functional tests check structure, not diagnostic correctness. The defects that taught me most were integration and deployment faults that no planned test anticipated.</p>
+<div class="pager"><a class="pn prev" href="team-project.html">← Team Project</a><a class="pn next" href="case-studies.html">Case Studies →</a></div>
+<footer><p>© 2026 Abdullah A. Buqshan · MSc Artificial Intelligence, University of Essex Online · Harvard (Cite Them Right) referencing</p></footer>
+</main>
+</div>
+</body>
+</html>
