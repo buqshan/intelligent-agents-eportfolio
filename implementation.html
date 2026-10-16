@@ -23,7 +23,7 @@
 <main id="main">
 <p class="eyebrow">Section 05</p>
 <h1>Implemented System and Critical Evaluation (Week 11)</h1>
-<p>I built a five-agent pipeline for network operations centre (NOC) incidents. An Orchestrator routes typed <code>AgentMessage</code> objects through a registry. A Planner produces a BDI-framed diagnostic plan. A Retrieval agent runs FAISS search (k = 3) over 15 fault patterns, following the RAG pattern (Lewis <em>et al.</em>, 2020). An Analyser prompts Mistral-7B-Instruct with a structured fallback, and a Reporter writes the resolution report. The app is deployed from GitHub on Streamlit Community Cloud. On 12 October 2026 I re-ran the suite and all 26 tests passed.</p>
+<p>I built a five-agent pipeline for network operations centre (NOC) incidents. An Orchestrator routes typed <code>AgentMessage</code> objects through a registry. A Planner produces a BDI-framed diagnostic plan. A Retrieval agent runs FAISS search (k = 3) over 15 fault patterns, following the RAG pattern (Lewis et al., 2020). An Analyser prompts Mistral-7B-Instruct with a structured fallback, and a Reporter writes the resolution report. The app is deployed from GitHub on Streamlit Community Cloud. On 12 October 2026 I re-ran the suite and all 26 tests passed.</p>
 <pre class="code" data-lang="python"><code># agents/orchestrator.py (excerpt): every hop is traced, so the run is auditable
 def _dispatch(self, target_name: str, payload: dict) -&gt; AgentMessage:
     self._msg_counter += 1

@@ -26,14 +26,14 @@
 <h3>Case Study 1: AI safety constraints and bounded autonomy</h3>
 <div class="rolfe">
 <div class="r r-what"><span class="rl">What?</span><p>My forum post imagined an agent that reboots routers on its own; peers challenged this. When I built the system, I gave the agents no actuators. They recommend, never act, and when the LLM call fails, <code>_fallback_result</code> returns confidence 0.0, escalation to Tier-2 and SLA risk HIGH. The test <code>test_edge_llm_timeout_does_not_crash_pipeline</code> confirms the pipeline still completes.</p></div>
-<div class="r r-so-what"><span class="rl">So what?</span><p>This places the system at a decision-support level of automation (Parasuraman, Sheridan and Wickens, 2000). It is bounded by construction, so no kill switch is needed, and its failure mode is fail-safe rather than fail-silent (Amodei <em>et al.</em>, 2016). But escalation is only a flag: nothing enforces it.</p></div>
+<div class="r r-so-what"><span class="rl">So what?</span><p>This places the system at a decision-support level of automation (Parasuraman, Sheridan and Wickens, 2000). It is bounded by construction, so no kill switch is needed, and its failure mode is fail-safe rather than fail-silent (Amodei et al., 2016). But escalation is only a flag: nothing enforces it.</p></div>
 <div class="r r-now-what"><span class="rl">Now what?</span><p>Any agent I propose at work that can act will carry an allow-list of reversible actions, change-window checks, a global kill switch and approval for irreversible ones, written as rules: ∀a ((Action(a) ∧ Irreversible(a)) → RequiresApproval(a)).</p></div>
 </div>
 <h3>Case Study 2: Explainable decisions</h3>
 <div class="rolfe">
 <div class="r r-what"><span class="rl">What?</span><p>The orchestrator logs every message (eight per run), and the report shows root cause, confidence and retrieved knowledge-base entries. Without a token, however, the Analyser returns templates with fixed confidences of 0.87, 0.91 or 0.95, and the deployed app runs in that mode.</p></div>
-<div class="r r-so-what"><span class="rl">So what?</span><p>The trace explains the process, not the reasoning. A confidence that was never computed is a false explanation, and calibration matters more than fluency (Guo <em>et al.</em>, 2017). Our team design was stronger here: every claim resolved to a source extract (Wang, G. <em>et al.</em>, 2026).</p></div>
-<div class="r r-now-what"><span class="rl">Now what?</span><p>I will label the provenance of every displayed number (for example, "synthetic: demo mode"), show the evidence beside each conclusion, and publish model cards (Mitchell <em>et al.</em>, 2019). Interpretability should be judged against the user's task (Doshi-Velez and Kim, 2017).</p></div>
+<div class="r r-so-what"><span class="rl">So what?</span><p>The trace explains the process, not the reasoning. A confidence that was never computed is a false explanation, and calibration matters more than fluency (Guo et al., 2017). Our team design was stronger here: every claim resolved to a source extract (Wang, G. et al., 2026).</p></div>
+<div class="r r-now-what"><span class="rl">Now what?</span><p>I will label the provenance of every displayed number (for example, "synthetic: demo mode"), show the evidence beside each conclusion, and publish model cards (Mitchell et al., 2019). Interpretability should be judged against the user's task (Doshi-Velez and Kim, 2017).</p></div>
 </div>
 <h3>Case Study 3: Bias in autonomous decision-making</h3>
 <div class="rolfe">
@@ -48,7 +48,7 @@
 &#x27;DEFAULT&#x27;
 </code></pre>
 <div class="rolfe">
-<div class="r r-so-what"><span class="rl">So what?</span><p>This is representational bias with a shared blind spot: the person who wrote the rules also wrote the tests, so 26/26 revealed nothing (Mehrabi <em>et al.</em>, 2021). An engineer shown a BGP plan may anchor on it, which is automation bias. The team design had its own coverage bias: two sources, abstracts only, English only.</p></div>
+<div class="r r-so-what"><span class="rl">So what?</span><p>This is representational bias with a shared blind spot: the person who wrote the rules also wrote the tests, so 26/26 revealed nothing (Mehrabi et al., 2021). An engineer shown a BGP plan may anchor on it, which is automation bias. The team design had its own coverage bias: two sources, abstracts only, English only.</p></div>
 <div class="r r-now-what"><span class="rl">Now what?</span><p>Next time I will use word-boundary matching or a classifier evaluated with a confusion matrix on tickets written by other engineers, add an explicit "uncertain" route, and have tests written by someone other than the rule author.</p></div>
 </div>
 <div class="pager"><a class="pn prev" href="implementation.html">← Implementation</a><a class="pn next" href="reflection.html">Reflection →</a></div>
